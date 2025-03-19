@@ -1,21 +1,38 @@
 #include <Arduino.h>
+#include "DHT.h"
 
-// put function declarations here:
-int myFunction(int, int);
+// Ustawienia DHT11
+#define DHTPIN 26      // Pin podłączony do czujnika DHT11
+#define DHTTYPE DHT11  // Typ czujnika
+
+DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
   Serial.begin(115200);
+  dht.begin();
+  Serial.println("Odczyt danych z DHT11...");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  Serial.println("TEST POLACZENIA");
-  delay(500);
-}
+  // DHT11 potrzebuje trochę czasu pomiędzy pomiarami
+  delay(2000);
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  // Odczyt temperatury i wilgotności
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  // Sprawdzenie, czy odczyt się powiódł
+  if (isnan(humidity) || isnan(temperature)) {
+    Serial.println("Błąd odczytu z czujnika DHT11!");
+    return;
+  }
+
+  // Wysyłanie danych na Serial Monitor
+  Serial.print("Wilgotność: ");
+  Serial.print(humidity);
+  Serial.print(" %\t");
+
+  Serial.print("Temperatura: ");
+  Serial.print(temperature);
+  Serial.println(" *C");
 }
